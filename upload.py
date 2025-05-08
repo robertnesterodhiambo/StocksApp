@@ -20,24 +20,30 @@ df = pd.read_csv(csv_path)
 if 'Adj Close' in df.columns:
     df = df.drop(columns=['Adj Close'])
 
-# SQL queries
-drop_table_sql = "DROP TABLE IF EXISTS Stocks_data"
-
+# SQL to create the table if it doesn't exist
 create_table_sql = """
-CREATE TABLE Stocks_data (
+CREATE TABLE IF NOT EXISTS Stocks_data (
     Date DATE,
     Open FLOAT,
     High FLOAT,
     Low FLOAT,
     Close FLOAT,
     Volume BIGINT,
-    Ticker VARCHAR(10)
+    Ticker VARCHAR(10),
+    PRIMARY KEY (Date, Ticker)
 )
 """
 
+# SQL to insert or update if duplicate exists
 insert_sql = """
 INSERT INTO Stocks_data (Date, Open, High, Low, Close, Volume, Ticker)
 VALUES (%s, %s, %s, %s, %s, %s, %s)
+ON DUPLICATE KEY UPDATE
+    Open = VALUES(Open),
+    High = VALUES(High),
+    Low = VALUES(Low),
+    Close = VALUES(Close),
+    Volume = VALUES(Volume)
 """
 
 def upload_to_mysql(batch_size=100000):
@@ -47,23 +53,20 @@ def upload_to_mysql(batch_size=100000):
         cursor = conn.cursor()
         print("✅ Connected to database")
 
-        # Drop and recreate table
-        cursor.execute(drop_table_sql)
-        print("🗑️ Dropped existing Stocks_data table")
-
+        # Create table if it doesn't exist
         cursor.execute(create_table_sql)
-        print("🧱 Recreated Stocks_data table")
+        print("🧱 Ensured Stocks_data table exists")
 
-        # Prepare records with NaNs converted to None (NULL in MySQL)
+        # Prepare records with NaNs converted to None
         records = df[['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'Ticker']].where(pd.notnull(df), None).values.tolist()
 
-        # Insert in batches
+        # Insert in batches with update on duplicate key
         total = len(records)
         for i in range(0, total, batch_size):
             batch = records[i:i + batch_size]
             cursor.executemany(insert_sql, batch)
             conn.commit()
-            print(f"✅ Inserted rows {i+1} to {min(i+batch_size, total)}")
+            print(f"✅ Upserted rows {i+1} to {min(i+batch_size, total)}")
 
     except Error as e:
         print(f"❌ Error: {e}")
