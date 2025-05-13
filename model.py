@@ -21,7 +21,7 @@ tf.random.set_seed(42)
 # Parameters
 look_back = 20
 batch_size = 25
-base_model_dir = 'models_lstm'
+base_model_dir = '/home/dragon/DATA/models_lstm'
 os.makedirs(base_model_dir, exist_ok=True)
 
 # Load data
@@ -49,6 +49,13 @@ for batch_start in range(0, len(tickers), batch_size):
     print(f"\n🚀 Processing batch {batch_start // batch_size + 1} ({len(batch)} tickers)")
 
     for ticker in batch:
+        # Skip training if model already exists
+        ticker_dir = os.path.join(base_model_dir, ticker)
+        model_path = os.path.join(ticker_dir, 'model.h5')
+        if os.path.exists(model_path):
+            print(f"⏩ Model already exists for {ticker}, skipping.")
+            continue
+
         try:
             print(f"\n🔍 Training LSTM model for {ticker}...")
 
@@ -96,7 +103,6 @@ for batch_start in range(0, len(tickers), batch_size):
 
             # Save model, scaler, and plot if accuracy is acceptable
             if accuracy >= 80:
-                ticker_dir = os.path.join(base_model_dir, ticker)
                 os.makedirs(ticker_dir, exist_ok=True)
 
                 model.save(os.path.join(ticker_dir, 'model.h5'))
