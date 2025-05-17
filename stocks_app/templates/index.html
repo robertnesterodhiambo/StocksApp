@@ -9,18 +9,20 @@
     <div class="container">
         <h1>📈 STOCKS APP</h1>
         <div class="dashboard">
+            {% for i in range(1, 4) %}
             <div class="card">
-                <h2>Prediction 1</h2>
+                <h2>Prediction {{ i }}</h2>
+                <form>
+                    <label for="stock{{ i }}">Choose a stock:</label>
+                    <select id="stock{{ i }}" name="stock{{ i }}">
+                        {% for stock in stocks %}
+                            <option value="{{ stock }}">{{ stock }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
                 <p>Coming soon...</p>
             </div>
-            <div class="card">
-                <h2>Prediction 2</h2>
-                <p>Coming soon...</p>
-            </div>
-            <div class="card">
-                <h2>Prediction 3</h2>
-                <p>Coming soon...</p>
-            </div>
+            {% endfor %}
         </div>
     </div>
 </body>
