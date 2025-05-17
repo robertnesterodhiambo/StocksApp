@@ -8,22 +8,36 @@
 <body>
     <div class="container">
         <h1>📈 STOCKS APP</h1>
-        <div class="dashboard">
-            {% for i in range(1, 4) %}
-            <div class="card">
-                <h2>Prediction {{ i }}</h2>
-                <form>
+        <form method="POST">
+            <div class="dashboard">
+                {% for i in range(1, 4) %}
+                <div class="card">
+                    <h2>Prediction {{ i }}</h2>
                     <label for="stock{{ i }}">Choose a stock:</label>
                     <select id="stock{{ i }}" name="stock{{ i }}">
                         {% for stock in stocks %}
-                            <option value="{{ stock }}">{{ stock }}</option>
+                            <option value="{{ stock }}"
+                                {% if selected_stocks[i-1] == stock %}selected{% endif %}>
+                                {{ stock }}
+                            </option>
                         {% endfor %}
                     </select>
-                </form>
-                <p>Coming soon...</p>
+                </div>
+                {% endfor %}
             </div>
+            <br>
+            <button type="submit">Load Models</button>
+        </form>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <ul class="flashes">
+            {% for category, message in messages %}
+              <li class="{{ category }}">{{ message }}</li>
             {% endfor %}
-        </div>
+            </ul>
+          {% endif %}
+        {% endwith %}
     </div>
 </body>
 </html>
