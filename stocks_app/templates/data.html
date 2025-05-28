@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stock Data</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #eee;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>📊 Stock Data Viewer</h1>
+    <form method="POST">
+        <label>Ticker: <input type="text" name="ticker" value="{{ filters.ticker }}"></label>
+        <label>Start Date: <input type="date" name="start_date" value="{{ filters.start_date }}"></label>
+        <label>End Date: <input type="date" name="end_date" value="{{ filters.end_date }}"></label>
+        <button type="submit">Filter</button>
+    </form>
+
+    {% if data %}
+    <table id="data-table">
+        <thead>
+            <tr>
+                {% for col in data[0].keys() %}
+                    <th onclick="sortTable({{ loop.index0 }})">{{ col }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+            <tr>
+                {% for val in row.values() %}
+                    <td>{{ val }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p>No results found. Try different filters.</p>
+    {% endif %}
+</div>
+
+<script>
+function sortTable(colIndex) {
+    const table = document.getElementById("data-table");
+    const rows = Array.from(table.rows).slice(1);
+    const sorted = rows.sort((a, b) => {
+        let x = a.cells[colIndex].innerText;
+        let y = b.cells[colIndex].innerText;
+        return y.localeCompare(x, undefined, {numeric: true});
+    });
+    sorted.forEach(row => table.appendChild(row));
+}
+</script>
+</body>
+</html>

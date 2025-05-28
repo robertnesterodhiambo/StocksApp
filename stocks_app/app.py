@@ -1,14 +1,16 @@
 import os
 from flask import Flask, render_template, request, flash
 from tensorflow.keras.models import load_model
+import mysql.connector
 
 app = Flask(__name__)
 app.secret_key = "supersecretkey"  # Needed for flash messages
 
+# ========== MODEL LOADING SETUP (unchanged) ==========
 MODEL_BASE_PATH = os.path.expanduser("~/DATA/models_lstm")
 
 def get_stock_list():
-    with open("company_list.txt", "r") as file:
+    with open("/home/dragon//GIT/StocksApp/company_list.txt", "r") as file:
         return [line.strip() for line in file if line.strip()]
 
 def load_stock_model(stock):
@@ -37,5 +39,53 @@ def home():
 
     return render_template("index.html", stocks=stocks, selected_stocks=selected_stocks)
 
+# ========== DATABASE CONFIGURATION ==========
+db_config = {
+    "host": "104.238.220.190",
+    "database": "stocksjbetadev_Stocks",
+    "user": "stocksjbetadev",
+    "password": "qZh]R0+inyo+"
+}
+
+# ========== DATA FETCHING & FILTERING ==========
+def fetch_data(ticker=None, start_date=None, end_date=None):
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor(dictionary=True)
+
+    query = "SELECT * FROM Stocks_data WHERE 1=1"
+    params = []
+
+    if ticker:
+        query += " AND Ticker = %s"
+        params.append(ticker)
+    if start_date:
+        query += " AND Date >= %s"
+        params.append(start_date)
+    if end_date:
+        query += " AND Date <= %s"
+        params.append(end_date)
+
+    query += " ORDER BY Date DESC"
+    cursor.execute(query, params)
+    rows = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return rows
+
+# ========== DATA TABLE VIEW ROUTE ==========
+@app.route("/data", methods=["GET", "POST"])
+def view_data():
+    filters = {"ticker": "", "start_date": "", "end_date": ""}
+    results = []
+
+    if request.method == "POST":
+        filters["ticker"] = request.form.get("ticker")
+        filters["start_date"] = request.form.get("start_date")
+        filters["end_date"] = request.form.get("end_date")
+        results = fetch_data(**filters)
+
+    return render_template("data.html", data=results, filters=filters)
+
+# ========== RUN APP ==========
 if __name__ == "__main__":
     app.run(debug=True)
