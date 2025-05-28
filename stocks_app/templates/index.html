@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>STOCKS APP</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -82,12 +84,10 @@
             margin-bottom: 20px;
         }
     </style>
-</head>
-<body>
     <div class="container">
         <h1>📈 STOCKS APP</h1>
         <a href="/data">
-            <button type="button" style="background-color: #28a745;">📊 View Stock Data</button>
+            <button type="button" style="background-color: #dc3545;">📊 View Stock Data</button>
         </a>
 
         <form method="POST">
@@ -107,8 +107,25 @@
                 </div>
                 {% endfor %}
             </div>
+            <br>
             <button type="submit">Load Models</button>
         </form>
+
+        {% if predictions %}
+        <div class="predictions">
+            <h2>Predictions (Next 3 Days)</h2>
+            {% for i, prediction in enumerate(predictions) %}
+                <div class="prediction-card">
+                    <h3>Predictions for Stock {{ i+1 }}:</h3>
+                    <ul>
+                        {% for p in prediction %}
+                            <li>{{ p }}</li>  <!-- Show predicted values for the next 3 days -->
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
 
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
