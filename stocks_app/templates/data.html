@@ -5,73 +5,91 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f6f9;
-            padding: 20px;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f5f6fa;
+            margin: 20px;
         }
+
         .container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: auto;
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
         }
+
         h1 {
             text-align: center;
-            color: #333;
+            color: #2c3e50;
         }
+
         form {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            justify-content: center;
             margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
         }
+
         label {
-            font-weight: bold;
+            font-weight: 500;
         }
-        select, input[type="date"] {
-            padding: 8px;
-            border-radius: 6px;
+
+        select, input[type="date"], button {
+            padding: 5px 10px;
             border: 1px solid #ccc;
-        }
-        button {
-            padding: 8px 20px;
-            background-color: #007bff;
-            color: white;
-            border: none;
             border-radius: 6px;
+            font-size: 14px;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
             cursor: pointer;
+            transition: 0.3s ease;
         }
+
         button:hover {
-            background-color: #0056b3;
+            background-color: #2980b9;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 15px;
+            margin-top: 20px;
+            background-color: white;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
         }
+
         th, td {
-            padding: 10px;
-            border: 1px solid #ddd;
+            padding: 10px 12px;
+            border: 1px solid #eee;
             text-align: center;
-            transition: background-color 0.3s ease;
         }
+
         th {
-            background-color: #007bff;
-            color: white;
-            cursor: pointer;
-        }
-        tr:hover td {
             background-color: #f1f1f1;
+            cursor: pointer;
+            position: sticky;
+            top: 0;
         }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        canvas {
+            margin-top: 40px;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
         p {
+            margin-top: 30px;
             text-align: center;
-            font-style: italic;
-            color: #888;
+            color: #777;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 <div class="container">
@@ -85,8 +103,12 @@
                 {% endfor %}
             </select>
         </label>
-        <label>Start Date: <input type="date" name="start_date" value="{{ filters.start_date }}"></label>
-        <label>End Date: <input type="date" name="end_date" value="{{ filters.end_date }}"></label>
+        <label>Start Date:
+            <input type="date" name="start_date" value="{{ filters.start_date }}">
+        </label>
+        <label>End Date:
+            <input type="date" name="end_date" value="{{ filters.end_date }}">
+        </label>
         <button type="submit">Filter</button>
     </form>
 
@@ -109,6 +131,67 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <canvas id="stockChart" height="100"></canvas>
+    <script>
+        const rawData = {{ data | tojson }};
+        if (rawData.length > 0) {
+            const labels = rawData.map(row => row.Date).reverse();
+            const columns = Object.keys(rawData[0]).filter(col => col !== 'Date' && col !== 'Ticker');
+
+            const datasets = columns.map((col, i) => {
+                const color = `hsl(${i * 60 % 360}, 70%, 50%)`;
+                return {
+                    label: col,
+                    data: rawData.map(row => row[col]).reverse(),
+                    borderColor: color,
+                    backgroundColor: color,
+                    fill: false,
+                    tension: 0.3
+                };
+            });
+
+            const ctx = document.getElementById('stockChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        title: {
+                            display: true,
+                            text: '📈 Stock Trends Over Time'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Value'
+                            },
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+        }
+    </script>
     {% else %}
         <p>No results found. Try different filters.</p>
     {% endif %}
