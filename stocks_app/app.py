@@ -6,7 +6,7 @@ import mysql.connector
 app = Flask(__name__)
 app.secret_key = "supersecretkey"  # Needed for flash messages
 
-# ========== MODEL LOADING SETUP (unchanged) ==========
+# ========== MODEL LOADING SETUP ==========
 MODEL_BASE_PATH = os.path.expanduser("~/DATA/models_lstm")
 
 def get_stock_list():
@@ -72,11 +72,21 @@ def fetch_data(ticker=None, start_date=None, end_date=None):
     conn.close()
     return rows
 
+def get_unique_tickers():
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor()
+    cursor.execute("SELECT DISTINCT Ticker FROM Stocks_data ORDER BY Ticker")
+    tickers = [row[0] for row in cursor.fetchall()]
+    cursor.close()
+    conn.close()
+    return tickers
+
 # ========== DATA TABLE VIEW ROUTE ==========
 @app.route("/data", methods=["GET", "POST"])
 def view_data():
     filters = {"ticker": "", "start_date": "", "end_date": ""}
     results = []
+    tickers = get_unique_tickers()
 
     if request.method == "POST":
         filters["ticker"] = request.form.get("ticker")
@@ -84,7 +94,7 @@ def view_data():
         filters["end_date"] = request.form.get("end_date")
         results = fetch_data(**filters)
 
-    return render_template("data.html", data=results, filters=filters)
+    return render_template("data.html", data=results, filters=filters, tickers=tickers)
 
 # ========== RUN APP ==========
 if __name__ == "__main__":

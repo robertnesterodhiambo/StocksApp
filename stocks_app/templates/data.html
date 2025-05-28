@@ -24,7 +24,14 @@
 <div class="container">
     <h1>📊 Stock Data Viewer</h1>
     <form method="POST">
-        <label>Ticker: <input type="text" name="ticker" value="{{ filters.ticker }}"></label>
+        <label for="ticker">Ticker:
+            <select name="ticker" id="ticker">
+                <option value="">-- All --</option>
+                {% for ticker in tickers %}
+                    <option value="{{ ticker }}" {% if filters.ticker == ticker %}selected{% endif %}>{{ ticker }}</option>
+                {% endfor %}
+            </select>
+        </label>
         <label>Start Date: <input type="date" name="start_date" value="{{ filters.start_date }}"></label>
         <label>End Date: <input type="date" name="end_date" value="{{ filters.end_date }}"></label>
         <button type="submit">Filter</button>
