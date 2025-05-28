@@ -4,19 +4,72 @@
     <title>Stock Data</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+        }
+        select, input[type="date"] {
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+        button {
+            padding: 8px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 15px;
         }
         th, td {
-            padding: 8px 10px;
+            padding: 10px;
             border: 1px solid #ddd;
             text-align: center;
+            transition: background-color 0.3s ease;
         }
         th {
-            background-color: #eee;
+            background-color: #007bff;
+            color: white;
             cursor: pointer;
+        }
+        tr:hover td {
+            background-color: #f1f1f1;
+        }
+        p {
+            text-align: center;
+            font-style: italic;
+            color: #888;
         }
     </style>
 </head>
