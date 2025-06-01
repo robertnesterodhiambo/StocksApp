@@ -15,7 +15,7 @@ MODEL_BASE_PATH = os.path.expanduser("~/DATA/models_lstm")
 LOOK_BACK = 20
 
 def get_stock_list():
-    with open("/home/dragon//GIT/StocksApp/company_list.txt", "r") as file:
+    with open("/home/dragon/Git/StocksApp/company_list.txt", "r") as file:
         return [line.strip() for line in file if line.strip()]
 
 def load_stock_model(stock):
