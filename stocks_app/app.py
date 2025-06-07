@@ -138,4 +138,4 @@ def view_data():
 
 # ========== RUN APP ==========
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.00")
+    app.run(debug=True, host="0.0.00", port = "5000")
