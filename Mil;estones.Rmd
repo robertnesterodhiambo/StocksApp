@@ -5,10 +5,10 @@ date: "`r Sys.Date()`"
 output: pdf_document
 ---
 
-###  **Milestone Budget – Total: \$175**
+### **Milestone Budget – Total: \$175**
 
 | Milestone | Task | Description | Payout |
-|--------------|--------------------------|--------------------|--------------|
+|----|----|----|----|
 | **1. Requirements Finalization & Data Prep** | • Finalize system flow<br>• Data cleaning & API fields mapping | Wraps up planning & ensures APIs (PropStream, TruthFinder) and datasets are ready. | **\$15** |
 | **2. AI Model Development** | • Build hybrid XGBoost + LSTM model<br>• Create prediction logic<br>• Output forecasts in table/chart | Predict property values for 6mo, 1yr, 1.5yr, 2yr. Includes model and test results. | **\$30** |
 | **3. Flask API for AI Model** | • Wrap AI model in Flask<br>• Provide endpoints for frontend<br>• Return forecast + confidence intervals | Enables communication between backend and frontend. | **\$15** |
